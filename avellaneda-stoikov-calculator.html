@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avellaneda-Stoikov · Interactive Quote Calculator — Roadmap to Quant</title>
+<style>
+  :root{
+    --navy:#0f1422; --panel:#171e30; --panel2:#1d2740; --line:#2a3550;
+    --gold:#c9a45c; --gold-bright:#d9a94e; --gold-soft:#cfa860;
+    --cream:#e9e2cf; --cream-bright:#f3efe4; --muted:#9aa3b8;
+    --green:#5aa06a; --red:#c0473a; --blue:#5b8fd6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--navy); color:var(--cream);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:24px 16px;
+  }
+  .wrap{max-width:840px; margin:0 auto; border:1px solid rgba(201,164,92,0.35); border-radius:12px; padding:24px 22px 20px; background:linear-gradient(0deg,var(--navy),var(--navy))}
+  header{text-align:center; margin-bottom:22px}
+  h1{font-family:Georgia,"Times New Roman",serif; font-size:26px; font-weight:500; color:var(--cream-bright); margin:0 0 4px; letter-spacing:.3px}
+  .sub{color:var(--gold-soft); font-size:13px; margin:0}
+  .rule{height:1px; background:rgba(201,164,92,0.3); margin:14px auto 0; max-width:120px}
+  .controls{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px 24px; margin:6px 0 22px}
+  .crow{display:flex; justify-content:space-between; align-items:baseline; font-size:13px; margin-bottom:6px}
+  .crow .name{color:var(--muted)}
+  .crow .val{color:var(--cream-bright); font-weight:600}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:3px; background:var(--line); outline:none; cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%; background:var(--gold-bright); border:2px solid #7a5f22; cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--gold-bright); border:2px solid #7a5f22; cursor:pointer}
+  .axiswrap{margin:0 0 22px}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:22px}
+  .card{background:var(--panel); border-radius:10px; padding:12px 14px}
+  .card .lab{font-size:12px; color:var(--muted); margin-bottom:2px}
+  .card .num{font-size:24px; font-weight:600; font-variant-numeric:tabular-nums}
+  .num.r{color:var(--gold-soft)} .num.d{color:var(--cream-bright)} .num.bid{color:var(--green)} .num.ask{color:var(--red)}
+  .bdlabel{font-size:13px; color:var(--muted); margin-bottom:6px}
+  .bar{display:flex; height:16px; border-radius:8px; overflow:hidden; background:var(--panel)}
+  #segM{background:var(--gold-bright)} #segI{background:var(--blue)}
+  .legend{display:flex; flex-wrap:wrap; gap:18px; font-size:12px; margin-top:8px; color:var(--muted)}
+  .legend b{color:var(--cream); font-weight:600}
+  .sw{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:middle}
+  .info{font-size:12px; color:var(--muted); margin-top:12px}
+  .info b{color:var(--cream)}
+  .btnrow{margin-top:18px; display:flex; gap:10px; flex-wrap:wrap}
+  button{background:transparent; color:var(--cream); border:1px solid var(--gold); border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer}
+  button:hover{background:rgba(201,164,92,0.12)}
+  footer{text-align:center; margin-top:20px; font-family:Georgia,serif; font-style:italic; color:var(--gold-soft); font-size:12px}
+  .formula{text-align:center; font-family:Georgia,serif; font-style:italic; color:var(--cream); font-size:14px; margin:2px 0 18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Avellaneda-Stoikov Quote Calculator</h1>
+    <p class="sub">Roadmap to Quant · hmaquant.com</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="formula">r = s − q·γσ²(T−t)&nbsp;&nbsp;·&nbsp;&nbsp;δ = (2/γ)·ln(1+γ/κ) + γσ²(T−t)&nbsp;&nbsp;·&nbsp;&nbsp;bid, ask = r ∓ δ/2</div>
+
+  <div class="controls">
+    <div><div class="crow"><span class="name">Mid price (s)</span><span class="val" id="v-s">100.0</span></div><input type="range" id="i-s" min="90" max="110" step="0.5" value="100"></div>
+    <div><div class="crow"><span class="name">Inventory (q)</span><span class="val" id="v-q">3</span></div><input type="range" id="i-q" min="-10" max="10" step="1" value="3"></div>
+    <div><div class="crow"><span class="name">Risk aversion (γ)</span><span class="val" id="v-g">0.10</span></div><input type="range" id="i-g" min="0.02" max="0.30" step="0.01" value="0.10"></div>
+    <div><div class="crow"><span class="name">Volatility (σ²)</span><span class="val" id="v-s2">4.0</span></div><input type="range" id="i-s2" min="0.5" max="10" step="0.5" value="4"></div>
+    <div><div class="crow"><span class="name">Liquidity (κ)</span><span class="val" id="v-k">1.5</span></div><input type="range" id="i-k" min="0.2" max="5" step="0.1" value="1.5"></div>
+    <div><div class="crow"><span class="name">Time left (T−t)</span><span class="val" id="v-t">0.50</span></div><input type="range" id="i-t" min="0.05" max="1" step="0.05" value="0.5"></div>
+  </div>
+
+  <div class="axiswrap" id="axis"></div>
+
+  <div class="cards">
+    <div class="card"><div class="lab">Reservation r</div><div class="num r" id="o-r">—</div></div>
+    <div class="card"><div class="lab">Spread δ</div><div class="num d" id="o-d">—</div></div>
+    <div class="card"><div class="lab">Bid</div><div class="num bid" id="o-bid">—</div></div>
+    <div class="card"><div class="lab">Ask</div><div class="num ask" id="o-ask">—</div></div>
+  </div>
+
+  <div class="bdlabel">Spread δ = margin (set by liquidity) + inventory cushion</div>
+  <div class="bar"><div id="segM" style="width:50%"></div><div id="segI" style="width:50%"></div></div>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--gold-bright)"></span>margin&nbsp;(2/γ·ln(1+γ/κ)) = <b id="o-margin">—</b></span>
+    <span><span class="sw" style="background:var(--blue)"></span>inventory&nbsp;(γσ²(T−t)) = <b id="o-inv">—</b></span>
+  </div>
+  <div class="info">Skew (r − mid) = <b id="o-skew">—</b> &nbsp;·&nbsp; danger per unit γσ²(T−t) = <b id="o-danger">—</b></div>
+
+  <div class="btnrow">
+    <button id="reset">Reset</button>
+    <button id="long">Long +8</button>
+    <button id="short">Short −8</button>
+    <button id="close">Near close</button>
+  </div>
+
+  <footer>Make the spread, manage the risk — hmaquant.com</footer>
+</div>
+
+<script>
+(function(){
+  var g=function(id){return document.getElementById(id);};
+  var inp={s:g('i-s'),q:g('i-q'),ga:g('i-g'),s2:g('i-s2'),k:g('i-k'),t:g('i-t')};
+  var val={s:g('v-s'),q:g('v-q'),ga:g('v-g'),s2:g('v-s2'),k:g('v-k'),t:g('v-t')};
+  var out={r:g('o-r'),d:g('o-d'),bid:g('o-bid'),ask:g('o-ask'),margin:g('o-margin'),inv:g('o-inv'),skew:g('o-skew'),danger:g('o-danger')};
+  var axis=g('axis'),segM=g('segM'),segI=g('segI');
+  function f(x,n){return Number(x).toFixed(n===undefined?2:n);}
+  function compute(){
+    var s=+inp.s.value,q=+inp.q.value,ga=+inp.ga.value,s2=+inp.s2.value,k=+inp.k.value,t=+inp.t.value;
+    var danger=ga*s2*t,shift=q*danger,r=s-shift;
+    var margin=(2/ga)*Math.log(1+ga/k),inv=danger,d=margin+inv;
+    return {s:s,q:q,danger:danger,shift:shift,r:r,margin:margin,inv:inv,d:d,bid:r-d/2,ask:r+d/2};
+  }
+  function draw(c){
+    var W=760,H=130,pX=52,mY=72;
+    var ps=[c.bid,c.ask,c.s,c.r],lo=Math.min.apply(null,ps),hi=Math.max.apply(null,ps);
+    var sp=(hi-lo)||1,pad=sp*0.18+0.4;lo-=pad;hi+=pad;
+    var X=function(p){return pX+((p-lo)/(hi-lo))*(W-2*pX);};
+    var bx=X(c.bid),ax=X(c.ask),sx=X(c.s),rx=X(c.r);
+    var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block">';
+    s+='<line x1="'+sx+'" y1="18" x2="'+sx+'" y2="'+(mY+10)+'" stroke="#5b6b86" stroke-width="1" stroke-dasharray="3 3"/>';
+    s+='<line x1="'+pX+'" y1="'+mY+'" x2="'+(W-pX)+'" y2="'+mY+'" stroke="#3a4560" stroke-width="1.5"/>';
+    s+='<line x1="'+bx+'" y1="54" x2="'+ax+'" y2="54" stroke="#9aa3b8" stroke-width="1"/>';
+    s+='<line x1="'+bx+'" y1="54" x2="'+bx+'" y2="59" stroke="#9aa3b8" stroke-width="1"/>';
+    s+='<line x1="'+ax+'" y1="54" x2="'+ax+'" y2="59" stroke="#9aa3b8" stroke-width="1"/>';
+    s+='<text x="'+((bx+ax)/2)+'" y="50" text-anchor="middle" fill="#9aa3b8" font-size="12" font-family="Georgia,serif" font-style="italic">δ = '+f(c.d)+'</text>';
+    s+='<line x1="'+bx+'" y1="'+(mY-8)+'" x2="'+bx+'" y2="'+(mY+8)+'" stroke="#5aa06a" stroke-width="2.5"/>';
+    s+='<line x1="'+ax+'" y1="'+(mY-8)+'" x2="'+ax+'" y2="'+(mY+8)+'" stroke="#c0473a" stroke-width="2.5"/>';
+    s+='<line x1="'+rx+'" y1="'+(mY-8)+'" x2="'+rx+'" y2="'+(mY+8)+'" stroke="#cfa860" stroke-width="2.5"/>';
+    s+='<line x1="'+sx+'" y1="'+(mY-6)+'" x2="'+sx+'" y2="'+(mY+6)+'" stroke="#9aa3b8" stroke-width="1.5"/>';
+    s+='<text x="'+sx+'" y="14" text-anchor="middle" fill="#9aa3b8" font-size="12" font-family="sans-serif">mid '+f(c.s)+'</text>';
+    s+='<text x="'+rx+'" y="36" text-anchor="middle" fill="#cfa860" font-size="12" font-weight="600" font-family="sans-serif">r '+f(c.r)+'</text>';
+    s+='<text x="'+bx+'" y="94" text-anchor="middle" fill="#5aa06a" font-size="12" font-family="sans-serif">bid '+f(c.bid)+'</text>';
+    s+='<text x="'+ax+'" y="110" text-anchor="middle" fill="#c0473a" font-size="12" font-family="sans-serif">ask '+f(c.ask)+'</text>';
+    s+='</svg>';
+    axis.innerHTML=s;
+  }
+  function update(){
+    val.s.textContent=f(+inp.s.value,1);
+    val.q.textContent=(+inp.q.value);
+    val.ga.textContent=f(+inp.ga.value,2);
+    val.s2.textContent=f(+inp.s2.value,1);
+    val.k.textContent=f(+inp.k.value,1);
+    val.t.textContent=f(+inp.t.value,2);
+    var c=compute();
+    out.r.textContent=f(c.r);out.d.textContent=f(c.d);out.bid.textContent=f(c.bid);out.ask.textContent=f(c.ask);
+    out.margin.textContent=f(c.margin);out.inv.textContent=f(c.inv);
+    out.skew.textContent=(c.shift===0?'0.00':(-c.shift>0?'+':'−')+f(Math.abs(c.shift)));
+    out.danger.textContent=f(c.danger);
+    segM.style.width=(c.margin/c.d*100)+'%';
+    segI.style.width=(c.inv/c.d*100)+'%';
+    draw(c);
+  }
+  [inp.s,inp.q,inp.ga,inp.s2,inp.k,inp.t].forEach(function(el){el.addEventListener('input',update);});
+  g('reset').addEventListener('click',function(){inp.s.value=100;inp.q.value=0;inp.ga.value=0.10;inp.s2.value=4;inp.k.value=1.5;inp.t.value=0.5;update();});
+  g('long').addEventListener('click',function(){inp.q.value=8;update();});
+  g('short').addEventListener('click',function(){inp.q.value=-8;update();});
+  g('close').addEventListener('click',function(){inp.t.value=0.05;update();});
+  update();
+})();
+</script>
+</body>
+</html>
